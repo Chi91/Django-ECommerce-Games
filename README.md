@@ -33,8 +33,6 @@ This online shop for games provides users with a platform to browse and purchase
 - **Hosting:** The web application is hosted on an online platform like PythonAnywhere, making it available on the internet and not just locally on a laptop.
 
 ## Installation and Usage
-1. **Clone the Repository:**
-   ```bash
    git clone <repository-url>
 
    pip install -r requirements.txt
