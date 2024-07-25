@@ -1,0 +1,51 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Comment Report Management{% endblock %}
+
+{% block logged_in_content %}
+<h2 class="m-3"><i class="fa-solid fa-trash"></i> Comment Report Management</h2>
+    <a href={% url 'game-list' %} class="btn btn-secondary mb-5 mx-3"><i class="fa-solid fa-list"></i> Back to Game List</a>
+    {% for comment in all_the_comments %}
+    <div class="card m-3 col-lg-6">
+      <div class="card-header">
+        <a href="{% url 'game-detail' comment.game.id %}"><b><i class="fa-solid fa-gamepad"></i> {{ comment.game.name }}</b></a>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title"><i class="fa-solid fa-user"></i> {{ comment.user.username }}</h5>
+        <p class="card-text mb-3">
+          {% if comment.rating != -1 %}
+            {% if comment.rating >= 1 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if comment.rating >= 2 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if comment.rating >= 3 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if comment.rating >= 4 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if comment.rating >= 5 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% else %}
+            not rating
+          {% endif %}
+        </p>
+        <p class="card-text">{{ comment.text }}</p>
+        <form method="POST" enctype="multipart/form-data">
+        <div class="btn-group my-2" role="group">
+          <a href={% url 'game-detail' comment.game.id %} class="btn btn-secondary"><i class="fa-solid fa-gamepad"></i> Go to Game Detail</a>
+            {% csrf_token %}
+            <input type="hidden" id="comment_id" name="comment_id" value="{{ comment.id }}">
+            <button type="submit" class="btn btn-danger" name="delete"><i class="fa-solid fa-trash"></i> Delete</button>
+            <button type="submit" class="btn btn-info" name="unreport"><i class="fa-solid fa-multiply"></i> Unreport</button>
+          </div>
+        </form>
+      </div>
+    </div>
+        <!-- <span class="h3 text-muted"><i class="fa-solid fa-user"></i> {{ comment.myuser.username }} on</span>
+        <a href="{% url 'game-detail' comment.game.id %}"><i class="fa-solid fa-gamepad"></i> {{ comment.game.name }}</a><br>
+        {{ comment.text }}<br>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" id="comment_id" name="comment_id" value="{{ comment.id }}">
+            <a href={% url 'game-detail' comment.game.id %} class="btn btn-secondary">Back to Game Detail</a>
+            <button type="submit" class="btn btn-danger" name="delete">Delete</button>
+        </form>
+        <br> -->
+    {% endfor %}
+
+{% endblock %}

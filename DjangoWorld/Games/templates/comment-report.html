@@ -1,0 +1,53 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Report comment{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Games/game_style.css' %}">
+{% endblock %}
+
+{% block logged_in_content %}
+
+<div class="m-3 col-lg-6">
+  <h2>Report Comment</h2>
+  {% if form.non_field_errors %}
+    <div class="alert alert-warning my-2" role="alert">
+      {{ form.non_field_errors.as_text }}
+    </div>
+  {% endif %}
+  <div class="card m-3 col-lg-6">
+    <div class="card-header">
+      <a href="{% url 'game-detail' comment.game.id %}"><b><i class="fa-solid fa-gamepad"></i> {{ comment.game.name }}</b></a>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title"><i class="fa-solid fa-user"></i> {{ comment.user.username }}</h5>
+      <p class="card-text mb-3">
+        {% if comment.rating != -1 %}
+          {% if comment.rating >= 1 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% if comment.rating >= 2 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% if comment.rating >= 3 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% if comment.rating >= 4 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% if comment.rating >= 5 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+        {% else %}
+          not rating
+        {% endif %}
+      </p>
+      <p class="card-text">{{ comment.text }}</p>
+    </div>
+  </div>
+  <form method="POST" class="mb-2" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="my-2">
+        <input type="hidden" id="reported_id" name="reported" value="">
+        <button type="submit" class="btn btn-danger"><i class="fa-solid fa-bullhorn"></i> Report Comment</button>
+        <a href="{% url 'game-detail' comment.game.id %}" class="btn btn-secondary"><i class="fa-solid fa-multiply"></i> Cancel</a>
+      </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block not_logged_in_content %}
+    <p>You must log in to report a comment</p>
+    <a href="{% url 'login' %}">Login</a>
+{% endblock %}

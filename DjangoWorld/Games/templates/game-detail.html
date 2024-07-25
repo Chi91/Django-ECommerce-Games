@@ -1,0 +1,260 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Game detail{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Games/game_style.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Game Detail Block -->
+<div class="mx-3 mt-3 col-lg-6">
+  <span class="h1"><i class="fa-solid fa-gamepad"></i> Game detail</span>
+  {% if that_one_game.picture %}
+    <div class="mb-3 mt-5">
+      <div class="rounded" style="background-image:url('{{ that_one_game.picture.url }}');background-size:cover;width:100%;height:20em;background-position:center;background-repeat:no-repeat;">
+      </div>
+      <img src="" class="rounded" style=""><br>
+    </div>
+  {% endif %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Field</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-font"></i> Name</th>
+        <td>{{ that_one_game.name }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-tag"></i> Genre</th>
+        <td>{{ that_one_game.get_genre_display }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-comment"></i> Description</th>
+        <td>{{ that_one_game.description }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-star-half-stroke"></i> Rating</th>
+        <td>
+          {% if rating != -1 %}
+            {% if rating >= 1 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if rating >= 2 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if rating >= 3 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if rating >= 4 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            {% if rating >= 5 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+          {% else %}
+            not yet rated
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-child"></i> FSK</th>
+        <td>{{ that_one_game.get_fsk_display }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-calendar"></i> Date Published</th>
+        <td>{{ that_one_game.date_published }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-dollar-sign"></i> Price</th>
+        <td>{{ that_one_game.price }}$</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-user"></i> Entered By</th>
+        <td>{{ that_one_game.user.username }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-file-text"></i> PDF File</th>
+        <td><a href="{{ that_one_game.pdf.url }}" target="_blank">Some uploaded file <i class="fa-solid fa-link"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- Game Management Buttons -->
+  <form method="POST">
+    <div class="mt-2 btn-group" role="group">
+      {% if can_edit %}
+        <a href="{% url 'game-edit-delete' that_one_game.id %}" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Game Editing</a>
+      {% endif %}
+      {% if can_delete %}
+        <a href="{% url 'game-delete' that_one_game.id %}" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Delete Game</a>
+      {% endif %}
+      {% if can_delete %}
+        <a href="{% url 'comment-delete' %}" class="btn btn-warning"><i class="fa-solid fa-bullhorn"></i> Comment Report Manager</a>
+      {% endif %}
+    </div>
+    <br />
+    <div class="mt-2 mb-5 btn-group">
+      {% if user.is_authenticated %}
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary rounded-start" name="add_shopping_cart"><i class="fa-solid fa-cart-plus"></i> Add to Shopping Cart</button>
+      {% else %}
+        <a class="btn btn-primary disabled" href="{% url 'login' %}"><i class="fa-solid fa-cart-plus"></i>Login to Add to Cart</a>
+      {% endif %}
+      <a href="{% url 'game-list' %}" class="btn btn-secondary"><i class="fa-solid fa-list"></i> Back to all games</a>
+    </div>
+  </form>
+</div>
+<!-- Add Comment Block -->
+{% if can_comment %}
+  <div class="mx-3 card shadow rounded-2 col-lg-6">
+    <div class="m-3">
+      <h5><i class="fa-sold fa-plus"></i>Add a Comment</h5>
+      <form method="POST">
+          {% csrf_token %}
+          <div class="form-group my-2">
+            <label for="{{ comment_form.text.id_for_label }}">Text</label>
+            <textarea class="form-control" id="id_text" rows="3" name="text"></textarea>
+            {% if comment_form.text.errors %}
+              <div class="alert alert-warning mb-2" role="alert">
+                {{ comment_form.text.errors.as_text }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="form-group my-2">
+            <label for="{{ comment_form.rating.id_for_label }}">Rating</label>
+            <select class="form-control" id="id_rating" name="rating">
+              <option value="1">1 Star</option>
+              <option value="2">2 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="5">5 Stars</option>
+            </select>
+            {% if form.rating.errors %}
+              <div class="alert alert-warning mb-3" role="alert">
+                {{ form.rating.errors.as_text }}
+              </div>
+            {% endif %}
+          </div>
+          <div class="mt-3">
+            <button type="submit" name ="add_comment" class="btn btn-success"><i class="fa-solid fa-plus"></i> Add Comment</button>
+          </div>
+      </form>
+    </div>
+  </div>
+{% endif %}
+<div class="m-3 col-lg-6">
+  <!-- Comments Block -->
+  <div class="my-5">
+  {% for comment in comments_for_that_one_game %}
+    <div class="card shadow-sm rounded-2 my-2">
+      <div class="card-body">
+        {% if comment.reported %}
+        <h5 class="card-title placeholder-glow">
+          <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+        </h5>
+        {% else %}
+          {% if comment.user.id == that_one_game.user.id %}
+          <h5 class="card-title">{{ comment.user.username }}<span class="badge bg-secondary ml-3"><i class="fa-solid fa-gamepad"></i> Game Author</span></h5>
+          {% elif comment.user.id == user.id  %}
+          <h5 class="card-title">{{ comment.user.username }}<span class="badge bg-primary ml-3"><i class="fa-solid fa-user"></i> You</span></h5>
+          {% else %}
+          <h5 class="card-title">{{ comment.user.username }}</h5>
+          {% endif %}
+        {% endif %}
+        {% if comment.reported %}
+        <h6 class="card-subtitle mb-2 placeholder-glow">
+          <span class="placeholder" style="width:10em;"></span>
+        </h6>
+        {% else %}
+        <h6 class="card-subtitle mb-2">
+          {{ comment.timestamp }}
+        </h6>
+        {% endif %}
+        {% if comment.rating != -1 %}
+          {% if comment.reported %}
+            <h6 class="card-subtitle mb-3 mt-2 placeholder-glow">
+                <span class="placeholder" style="width:7em;"></span>
+            </h6>
+          {% else %}
+            <h6 class="card-subtitle mb-3 mt-2">
+              {% if comment.rating >= 1 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+              {% if comment.rating >= 2 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+              {% if comment.rating >= 3 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+              {% if comment.rating >= 4 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+              {% if comment.rating >= 5 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+            </h6>
+          {% endif %}
+        {% else %}
+        <h6 class="card-subtitle mb-3 mt-2">
+          no rating
+        </h6>
+        {% endif %}
+        <div class="card-text">
+          {% if comment.reported %}
+          <div class="mb-3 placeholder-glow">
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+            <span class="placeholder" style="width:{{ random_wordsize }}em;"></span>
+          </div>
+          <div class="alert alert-warning mb-3 d-flex" role="alert">
+            <span>This comment has been hidden due to user reports.</span>
+          </div>
+          {% else %}
+          <div class="mb-3">
+            <span>{{ comment.text }}</span>
+          </div>
+          {% endif %}
+          {% if comment.reported %}
+          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+            <a  href="#" type="button" class="btn btn-outline-primary placeholder-glow disabled">
+              <span class="placeholder" style="width:2em;"></span>
+            </a>
+            <a  href="#" type="button" class="btn btn-outline-primary placeholder-glow disabled">
+              <span class="placeholder" style="width:2em;"></span>
+            </a>
+          </div>
+          {% else %}
+          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+            <a  href="{% url 'game-vote' comment.id 'up' %}" type="button" class="btn btn-outline-primary">
+              <i class="fa-solid fa-thumbs-up"></i> {{ comment.get_upvotes_count }}
+            </a>
+            <a href="{% url 'game-vote' comment.id 'down' %}" type="button" class="btn btn-outline-primary">
+              <i class="fa-solid fa-thumbs-down"></i> {{ comment.get_downvotes_count }}
+            </a>
+          </div>
+          {% endif %}
+          <div style="float: right;">
+            <div class="btn-group" role="group">
+              {% if comment.user.id == user.id %}
+              <a href="{% url 'comment-edit-delete' comment.id %}" type="button" class="btn btn-sm btn-warning">
+                <i class="fa-solid fa-pen"></i> Edit Comment
+              </a>
+              {% endif %}
+              {% if not comment.reported %}
+              <a href="{% url 'comment-report' comment.id %}" type="button" class="btn btn-sm btn-danger">
+                <i class="fa-solid fa-bullhorn"></i> Report Comment
+              </a>
+              {% else %}
+              <a href="#" type="button" class="btn btn-sm btn-danger disabled">
+                <i class="fa-solid fa-bullhorn"></i> Already Reported
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endblock %}

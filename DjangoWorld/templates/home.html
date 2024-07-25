@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Homepage Title{% endblock %}
+
+{% block head %}
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/"><i class="fa-solid fa-infinity"></i> Project Blank Loop</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav me-auto">
+          {% if user.is_authenticated %}
+            {% if site == "home" %}
+              <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
+            {% else %}
+              <a class="nav-link" aria-current="page" href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
+            {% endif %}
+            {% if site == "game-list" %}
+              <a class="nav-link active" aria-current="page" href="{% url 'game-list' %}"><i class="fa-solid fa-list"></i> Game-List</a>
+            {% else %}
+              <a class="nav-link" aria-current="page" href="{% url 'game-list' %}"><i class="fa-solid fa-list"></i> Game-List</a>
+            {% endif %}
+            {% if user.is_superuser %}
+              <a class="nav-link" aria-current="page" href="/admin" target="_blank"><i class="fa-solid fa-gear"></i> Control Panel</a>
+            {% endif %}
+            {% if site == "shopping-cart" %}
+              <a class="nav-link active" aria-current="page" href="{% url 'shopping-cart-show' %}"><i class="fa-solid fa-shopping-cart"></i> Shopping Cart</a>
+            {% else %}
+              <a class="nav-link" aria-current="page" href="{% url 'shopping-cart-show' %}"><i class="fa-solid fa-shopping-cart"></i> Shopping Cart</a>
+            {% endif %}
+          {% else %}
+            {% if site == "login" %}
+              <a class="nav-link active" aria-current="page" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+            {% else %}
+              <a class="nav-link" aria-current="page" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+            {% endif %}
+            {% if site == "signup" %}
+              <a class="nav-link active" aria-current="page" href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Signup</a>
+            {% else %}
+              <a class="nav-link" aria-current="page" href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Signup</a>
+            {% endif %}
+          {% endif %}
+        </div>
+        <div class="navbar-text">
+          {% if user.is_authenticated %}
+          <div class="btn-group" role="group" aria-label="Profile">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                {% if user.is_superuser %}
+                <i class="fa-solid fa-user-cog rounded-right"></i> {{ user.username }}
+                {% else %}
+                <i class="fa-solid fa-user rounded-right"></i> {{ user.username }}
+                {% endif %}
+                <span class="badge bg-secondary"><i class="fa-solid fa-shopping-cart"></i> {{ request.user.count_shopping_cart_items }}</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="dropdownMenuButton1">
+                {% if user.profile_picture %}
+                <div class="m-2">
+                  <a target="_blank" href="{{ user.profile_picture.url }}"><img src="{{ user.profile_picture.url }}" class="img-fluid" /></a>
+                </div>
+                <li><hr class="dropdown-divider"></li>
+                {% endif %}
+                <li><a href="{% url 'shopping-cart-show' %}" class="dropdown-item"><i class="fa-solid fa-shopping-cart"></i> Shopping Cart</a></li>
+                <li><a href="{% url 'logout' %}" class="dropdown-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+</nav>
+
+{% endblock %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+
+    {% block logged_in_content %}
+      <div class="m-3">
+        <h1><i class="fa-solid fa-home"></i> Home</h1>
+        {% if user.is_superuser %}
+          <h3 class="mt-5">Hi <i class="fa-solid fa-user-gear"></i> {{ user.username }}!</h3>
+          {% if user.profile_picture %}
+          <div>
+            <img src="{{ user.profile_picture.url }}" class="img-fluid col-1 rounded"><br>
+          </div>
+          {% endif %}
+          <div class="my-2">
+            <span class="h5 text-secondary">You are a Superuser.</span><br />
+            <span class="h5 text-secondary">You have access to the <a href="/admin/" target="_blank"><i class="fa-solid fa-gear"></i> Control Panel</a></span>
+          </div>
+        {% else %}
+          <h1>Hi <i class="fa-solid fa-user"></i> {{ user.username }}!</h1>
+          {% if user.profile_picture %}
+          <div>
+            <img src="{{ user.profile_picture.url }}" class="img-fluid col-1 rounded"><br>
+          </div>
+          {% endif %}
+        {% endif %}
+          <div class="my-3">
+            <a href="{% url 'game-list' %}" class="btn btn-primary"><i class="fa-solid fa-list"></i> Games List</a>
+            <a href="{% url 'logout' %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+          </div>
+      </div>
+    {% endblock %}
+  {% else %}
+    {% block not_logged_in_content %}
+      <div class="m-3">
+        <h1>You are not logged in.</h1>
+        <div class="my-3">
+          <a href="{% url 'login' %}" class="btn btn-lg btn-primary"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+          <a href="{% url 'signup' %}" class="btn btn-lg btn-secondary"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+        </div>
+      </div>
+    {% endblock %}
+  {% endif %}
+{% endblock %}
+
+{% block navbar %}<!-- placeholder navbar -->{% endblock %}

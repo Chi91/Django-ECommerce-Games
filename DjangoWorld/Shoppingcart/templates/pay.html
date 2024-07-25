@@ -1,0 +1,55 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<h1 class="mx-3 mt-3 mb-5"><i class="fa-solid fa-credit-card"></i> Payment</h1>
+<div class="m-3 col-lg-6">
+    {% if paid %}
+        <div class="alert alert-primary my-3" role="alert">
+          Thank you for your payment.
+        </div>
+        <a class="my-3 btn btn-primary" href="{% url 'home' %}">Keep shopping</a>
+    {% elif shopping_cart_is_empty %}
+        <div class="alert alert-secondary my-3" role="alert">
+          Your shopping cart is empty. There is nothing to pay for.
+        </div>
+        <a class="my-3 btn btn-primary" href="{% url 'home' %}">Keep shopping</a>
+    {% else %}
+        <form method="POST" class="my-3">
+            {% csrf_token %}
+            <div class="form-group my-2">
+              <label for="{{ payment_form.credit_card_number.id_for_label }}">Credit Card Number</label>
+              <input type="text" class="form-control" id="id_credit_card_number" name="credit_card_number" placeholder="3700 0000 0000 002" required="" maxlength="19">
+              {% if payment_form.credit_card_number.errors %}
+                <div class="alert alert-warning mb-2" role="alert">
+                  {{ payment_form.credit_card_number.errors.as_text }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group my-2">
+              <label for="{{ payment_form.expiry_date.id_for_label }}">Expiry Date</label>
+              <input type="text" class="form-control" id="id_expiry_date" name="expiry_date" placeholder="1980/01" required="" maxlength="7">
+              {% if payment_form.expiry_date.errors %}
+                <div class="alert alert-warning mb-2" role="alert">
+                  {{ payment_form.expiry_date.errors.as_text }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="form-group my-2">
+              <label for="id_amount">Amount</label>
+              <input type="text" class="form-control" id="id_amount" name="amount" readonly="" disabled value="${{ amount }}">
+            </div>
+
+            <input type="hidden" id="shopping_cart_id" name="shopping_cart_id" value="{{ payment_form.shopping_cart.id }}">
+            <div class="btn-group my-3">
+              <button class="btn btn-primary" type="submit" name="Pay"><i class="fa-solid fa-sack-dollar"></i> Pay</button>
+              <a class="btn btn-secondary" href="{% url 'game-list' %}"><i class="fa-solid fa-list"></i> Keep shopping Games</a>
+            </div>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

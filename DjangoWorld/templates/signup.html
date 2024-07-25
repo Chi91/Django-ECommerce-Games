@@ -1,0 +1,59 @@
+{% extends 'home.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="m-3">
+  <h2><i class="fa-solid fa-user-plus"></i> Sign up</h2>
+  <form method="post" class="mb-4 col-6" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-warning mb-2" role="alert">
+        {{ form.non_field_errors.as_text }}
+      </div>
+    {% endif %}
+    <p>
+      <label for="id_username">Username</label>
+      <input class="form-control" type="text" name="username" maxlength="150" autocapitalize="none" autocomplete="username" autofocus="" required="" id="id_username">
+      {% if form.username.errors %}
+        <div class="alert alert-warning mb-2" role="alert">
+          {{ username.errors.as_text }}
+        </div>
+      {% endif %}
+      <small class="form-text form-muted">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</small>
+    </p>
+    <p>
+      <label for="id_password1">Password</label>
+      <input class="form-control" type="password" name="password1" autocomplete="new-password" required="" id="id_password1">
+      {% if form.password1.errors %}
+        <div class="alert alert-warning mb-2" role="alert">
+          {{ password1.errors.as_text }}
+        </div>
+      {% endif %}
+    </p>
+    <p>
+      <label for="id_password2">Confirm Password:</label>
+      <input class="form-control" type="password" name="password2" autocomplete="new-password" required="" id="id_password2">
+      {% if form.password2.errors %}
+        <div class="alert alert-warning mb-2" role="alert">
+          {{ password2.errors.as_text }}
+        </div>
+      {% endif %}
+      <small class="form-text form-muted">Enter the same password as before, for verification.</small>
+    </p>
+    <p>
+      <label for="id_profile_picture">Profile Picture</label>
+      <input class="form-control" type="file" name="profile_picture" accept="image/*" required="" id="id_profile_picture">
+      {% if form.profile_picture.errors %}
+        <div class="alert alert-warning mb-2" role="alert">
+          {{ profile_picture.errors.as_text }}
+        </div>
+      {% endif %}
+      <small class="form-text form-muted">Upload Profile Picture</small>
+    </p>
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Sign up</button>
+  </form>
+  <a href="{% url 'home' %}" class="btn btn-secondary"><i class="fa-solid fa-house"></i> Back to Homepage</a>
+</div>
+{% endblock %}

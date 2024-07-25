@@ -1,0 +1,65 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Shopping cart{% endblock %}
+
+{% block content %}
+<h2 class="m-3"><i class="fa-solid fa-shopping-cart"></i> Shopping cart</h2>
+    {% if shopping_cart_is_empty %}
+      <div class="d-flex m-3">
+        <ul class="list-group">
+          <li class="list-group-item list-group-item-secondary">
+            This shopping cart is empty.
+          </li>
+        </ul>
+      </div>
+    {% else %}
+      <div class="m-3 col-lg-6">
+          <div class="list-group">
+            {% for item in shopping_cart_items %}
+            <a href="/games/show/{{ item.game.id }}" class="list-group-item list-group-item-action">
+              {{ item.game.name }}
+              {% if item.quantity > 1 %}
+                (x{{ item.quantity }})
+              {% endif %}
+              <span style="float:right;">{{ item.game.price }}$ x {{ item.quantity }} = {{ item.amount }}$</span>
+            </a>
+            {% endfor %}
+          </div>
+        <div class="list-group my-3">
+          <div class="list-group-item list-group-item-primary">
+            Total <span style="float:right;">{{ total }}$</span>
+          </div>
+        </div>
+        <form method="POST">
+          {% csrf_token %}
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a href="{% url 'shopping-cart-pay' %}" type="button" name="pay" class="btn btn-primary"><i class="fa-solid fa-credit-card"></i> Go to Payment</a>
+            <button type="submit" name="empty" class="btn btn-warning"><i class="fa-solid fa-multiply"></i> Empty Shopping Cart</button>
+            <a class="btn btn-secondary" href="{% url 'game-list' %}"><i class="fa-solid fa-list"></i> Keep shopping the games</a>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+    <div class="m-3 col-lg-6">
+      <h3><i class="fa-solid fa-credit-card"></i> Past Payments</h3>
+    </div>
+    <div class="m-3 col-lg-6">
+      <div class="list-group">
+        {% if payment_count < 1 %}
+          <li class="list-group-item list-group-item-secondary">
+            No Payments have been made yet.
+          </li>
+        {% endif %}
+        {% for item in payments %}
+        <a href="/shoppingcart/payment/{{ item.id }}" class="list-group-item list-group-item-action">
+          {{ item.timestamp }} ({{ item.get_number_of_items }} Items)
+          <span style="float:right;">{{ item.amount }}$</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="mx-3 mb-3 mt-5 col-lg-6">
+      <a href="{% url 'game-list' %}" class="btn btn-primary"><i class="fa-solid fa-list"></i> Back to Game List</a> 
+    </div>
+{% endblock %}

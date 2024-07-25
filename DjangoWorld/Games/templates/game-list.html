@@ -1,0 +1,91 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Games/game_style.css' %}">
+{% endblock %}
+
+{% block title %}Games list{% endblock %}
+
+{% block content %}
+<div class="m-3 col-lg-6">
+  <h1><i class="fa-solid fa-list"></i> Games list</h1>
+  <form method="POST" class="mt-5">
+      {% csrf_token %}
+      <div class="input-group mt-2 mb-1">
+        <label class="input-group-text" for="{{ form.name.id_for_label }}"><i class="fa-solid fa-font"></i> Name</label>
+        <input type="text" class="form-control" id="id_name" name="name" value="{{ search_string_name }}">
+        <label class="input-group-text" for="{{ form.description.id_for_label }}"><i class="fa-solid fa-comment"></i> Description</label>
+        <input type="text" class="form-control" id="id_description" name="description" value="{{ search_string_description }}">
+        <label class="input-group-text" for="id_max_results"><i class="fa-solid fa-list"></i> Result Limit</label>
+        <select class="form-select" id="id_max_results"  name="max_results" value="{{ search_string_max_results }}">
+          <option value="5" {% if search_string_max_results == 5 %}selected=""{% endif %}>5 Results</option>
+          <option value="10" {% if search_string_max_results == 10 %}selected=""{% endif %}>10 Results</option>
+          <option value="15" {% if search_string_max_results == 15 %}selected=""{% endif %}>15 Results</option>
+          <option value="20" {% if search_string_max_results == 20 %}selected=""{% endif %}>20 Results</option>
+          <option value="25" {% if search_string_max_results == 25 %}selected=""{% endif %}>25 Results</option>
+          <option value="30" {% if search_string_max_results == 30 %}selected=""{% endif %}>30 Results</option>
+        </select>
+      </div>
+      <div class="input-group mb-1">
+        <label class="input-group-text" for="id_rating_min"><i class="fa-regular fa-star"></i> Min Stars</label>
+        <select class="form-select" id="id_rating_min"  name="rating_min" value="{{ search_string_rating_min }}">
+          <option value="1" {% if search_string_rating_min == 1 %}selected=""{% endif %}>1 Star</option>
+          <option value="2" {% if search_string_rating_min == 2 %}selected=""{% endif %}>2 Stars</option>
+          <option value="3" {% if search_string_rating_min == 3 %}selected=""{% endif %}>3 Stars</option>
+          <option value="4" {% if search_string_rating_min == 4 %}selected=""{% endif %}>4 Stars</option>
+          <option value="5" {% if search_string_rating_min == 5 %}selected=""{% endif %}>5 Stars</option>
+        </select>
+        <label class="input-group-text" for="id_rating_max"><i class="fa-solid fa-star"></i> Max Stars</label>
+        <select class="form-select" id="id_rating_max"  name="rating_max" value="{{ search_string_rating_max }}">
+          <option value="1" {% if search_string_rating_max == 1 %}selected=""{% endif %}>1 Star</option>
+          <option value="2" {% if search_string_rating_max == 2 %}selected=""{% endif %}>2 Stars</option>
+          <option value="3" {% if search_string_rating_max == 3 %}selected=""{% endif %}>3 Stars</option>
+          <option value="4" {% if search_string_rating_max == 4 %}selected=""{% endif %}>4 Stars</option>
+          <option value="5" {% if search_string_rating_max == 5 %}selected=""{% endif %}>5 Stars</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary mb-3 col-12"><i class="fa-solid fa-search"></i> Search</button>
+  </form>
+</div>
+<div class="col-lg-6 mx-3 mb-2 text-center">
+    <span class="text-muted"><b>{{ games_found_count }}</b> Games out of <b>{{ games_total }}</b> total Games found</span>
+</div>
+<div class="list-group mx-3 mb-3 col-lg-6">
+  {% for game in games_found %}
+    <a href="{{ game.id }}/" class="list-group-item list-group-item-action flex-column align-items-start border-0"
+    style="
+    background-image: linear-gradient(to right, rgba(255,255,255,.9) 0%,rgba(255,255,255,.7) 100%), url({{ game.picture.url }});
+    background-size: cover;width:100%;height:100%;background-position:center;background-repeat:no-repeat;">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1"><i class="fa-solid fa-gamepad"></i> {{ game.get_full_name }}</h5>
+        <small><i class="fa-solid fa-calendar"></i> {{ game.date_published }}</small>
+      </div>
+      <small>{{ game.get_genre_display }} / {{game.price}}$</small>
+      <div class="my-3">
+      {% if game.get_rating != -1 %}
+        {% if game.get_rating >= 1 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+        {% if game.get_rating >= 2 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+        {% if game.get_rating >= 3 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+        {% if game.get_rating >= 4 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+        {% if game.get_rating >= 5 %} <i class="fa-solid fa-star"></i> {% else %} <i class="fa-regular fa-star"></i> {% endif %}
+      {% else %}
+        not yet rated
+      {% endif %}
+      </div>
+      <p class="mb-1">{{game.description}}</p>
+      {% if can_edit %}
+        <a href="{% url 'game-edit-delete' game.id %}" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Edit</a>
+      {% endif %}
+    </a>
+  {% endfor %}
+  <div class="my-3">
+    <div class="btn-group" role="group">
+      {% if user.is_staff or user.is_superuser %}
+        <a href="{% url 'game-create' %}" class="btn btn-success"><i class="fa-solid fa-plus"></i> Add a new game</a>
+      {% endif %}
+      <a href="{% url 'home' %}" class="btn btn-secondary"><i class="fa-solid fa-house"></i> Go back to Homepage</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

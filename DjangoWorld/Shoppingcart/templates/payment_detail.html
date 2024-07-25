@@ -1,0 +1,65 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Game detail{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'Games/game_style.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Game Detail Block -->
+<div class="mx-3 mt-3 mb-5 col-lg-6">
+  <span class="h1"><i class="fa-solid fa-gamepad"></i> Payment Detail</span>
+  <table class="table mb-3">
+    <thead>
+      <tr>
+        <th scope="col">Field</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-font"></i> Buyer</th>
+        <td>{{ user.username }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-credit-card"></i> Credit Card Number</th>
+        <td>{{ payment.credit_card_number }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-clock"></i> Timestamp</th>
+        <td>{{ payment.timestamp }}</td>
+      </tr>
+      <tr>
+        <th scope="row"><i class="fa-solid fa-tag"></i> Expiry Date</th>
+        <td>{{ payment.expiry_date }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="m-3 col-lg-6">
+  <div class="list-group">
+    {% for item in payment_items %}
+    <a href="/games/show/{{ item.game.id }}" class="list-group-item list-group-item-action">
+      {{ item.game.name }}
+      {% if item.quantity > 1 %}
+        (x{{ item.quantity }})
+      {% endif %}
+      <span style="float:right;">{{ item.game.price }}$ x {{ item.quantity }} = {{ item.amount }}$</span>
+    </a>
+    {% endfor %}
+  </div>
+  <div class="list-group my-3">
+    <div class="list-group-item list-group-item-primary">
+      Total <span style="float:right;">{{ payment.amount }}$</span>
+    </div>
+  </div>
+</div>
+<div class="mx-3 mb-3 mt-5 col-lg-6">
+  <div class="btn-group" role="group">
+    <a href="{% url 'shopping-cart-show' %}" class="btn btn-primary"><i class="fa-solid fa-shopping-cart"></i> View Shopping Cart</a>
+    <a href="{% url 'game-list' %}" class="btn btn-secondary"><i class="fa-solid fa-list"></i> Back to Game List</a>
+  </div>
+</div>
+{% endblock %}
